@@ -1,0 +1,7 @@
+[project]
+name = "terminal-nav"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "windows-curses>=2.4.2",
+]
