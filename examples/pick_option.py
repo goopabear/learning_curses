@@ -2,8 +2,6 @@
 # For documentation on 'curses', visit: 'https://docs.python.org/3/library/curses.html#curses.init_pair'
 
 import curses
-
-from add_terminal import run_in_terminal
 import time
 
 # Define a menu function with an arbitrary argument, 'window'.

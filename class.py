@@ -4,7 +4,7 @@
 import curses
 import time
 
-from add_terminal import pop_out_terminal
+from util.add_terminal import pop_out_terminal
 
 
 class Content():
@@ -15,10 +15,11 @@ class Content():
 
         window.scrollok(True)
         window.idlok(True)
+        curses.curs_set(0)
 
         self.text = text
         self.window = window
-        self.cursor = curses.curs_set(0) # Terminal cursor; 0 = invisible, 1 = visible, 2 = borders-only
+        #self.cursor = curses.curs_set(0) # Terminal cursor; 0 = invisible, 1 = visible, 2 = borders-only
         self.font = curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK) # CSS-like styling; (id, foreground (text), background)
 
     def message(self):
@@ -31,7 +32,7 @@ class Content():
             self.lines.append(each_line)
             end_y -= 1
 
-        self.lines.reverse()
+        self.lines.reverse
 
     def total_lines(self):
         return self.lnum
