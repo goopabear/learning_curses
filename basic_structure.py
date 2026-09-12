@@ -4,7 +4,7 @@
 from util.add_terminal import pop_out_terminal
 
 import curses
-import time
+
 
 
 class Content():
@@ -23,15 +23,11 @@ class Content():
     def text_box(self):
         for char in self.text:
             self.window.addch(char) # Draws each character of the message one at a time
-            self.window.refresh()
-            time.sleep(0.01)
-
 
 
     def choices(self):
         print()
 
-        
 def menu(window, text):
     content = Content(window, text)
     content.font_color()
@@ -44,15 +40,31 @@ def menu(window, text):
         user_input = window.getch()
         return user_input
 
+class Terminal():
+    
+    def __init__(self):
+        self.text = 'Hi'
+        self.terminal = curses.wrapper(menu, self.text)
+        
+    def menu(self, window):
+        content = Content(window, self.text)
+        content.font_color()
+
+        while True:
+            window.clear()
+            content.text_box()
+            window.refresh()
+
+            user_input = window.getch()
+            return user_input
+
 
 
 if __name__ == "__main__":
 
-    @pop_out_terminal
+    @pop_out_terminal    
     def main():
-        text = 'Example'
-        output = curses.wrapper(menu, text)
-        if output:
-            print(output)
+        app = Terminal()
+        app.menu()
 
     main()
