@@ -6,6 +6,26 @@ from util.add_terminal import pop_out_terminal
 import curses
 
 
+@pop_out_terminal    
+def UI(window, text):
+    content = Content(window, text)
+    content.font_color()
+
+    while True:
+        window.clear()
+        y = content.text_box()
+        window.refresh()
+
+        user_input = window.getch()
+        return y
+
+class Terminal():
+    def __init__(self):
+        self.text = 'Hi'
+
+    def run(self):
+        return curses.wrapper(UI, self.text)
+
 
 class Content():
     def __init__(self, window, text: str):
@@ -19,52 +39,23 @@ class Content():
         curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK) # CSS-like styling; (id, foreground (text), background)
         self.window.attron(curses.color_pair(1))
 
+    def get_x(self) -> int:
+        y, x = self.window.getyx()
+        return x
+    
+    def get_y(self) -> int:
+        y, x = self.window.getyx()
+        return y
 
     def text_box(self):
         for char in self.text:
             self.window.addch(char) # Draws each character of the message one at a time
-
+        return self.get_y()
 
     def choices(self):
         print()
 
-def menu(window, text):
-    content = Content(window, text)
-    content.font_color()
-
-    while True:
-        window.clear()
-        content.text_box()
-        window.refresh()
-
-        user_input = window.getch()
-        return user_input
-
-class Terminal():
-    
-    def __init__(self):
-        self.text = 'Hi'
-        self.terminal = curses.wrapper(menu, self.text)
-        
-    def menu(self, window):
-        content = Content(window, self.text)
-        content.font_color()
-
-        while True:
-            window.clear()
-            content.text_box()
-            window.refresh()
-
-            user_input = window.getch()
-            return user_input
 
 
 
-if __name__ == "__main__":
 
-    @pop_out_terminal    
-    def main():
-        app = Terminal()
-        app.menu()
-
-    main()
