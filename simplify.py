@@ -32,31 +32,32 @@ class Terminal():
 
 class Content():
     def __init__(self, window):
-        window.scrollok(True)
-        window.idlok(True)
+
         self.window = window
-        self.cursor = curses.curs_set(0) # Terminal cursor; 0 = invisible, 1 = visible, 2 = borders-only
-        self.ycoord = 0
-        self.xcoord = 0
+        curses.curs_set(0) # Terminal cursor; 0 = invisible, 1 = visible, 2 = borders-only
+        self.curs_y = 0
+        self.curs_x = 0
+        self.cap_y = 0
+        self.cap_x = 0
         # Default font color:
         curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_BLACK) # CSS-like styling; (id, foreground (text), background)
         self.window.attron(curses.color_pair(1))
         
     # ----------------------------------------------------------------------------------------------------
     # Helper functions: 
-    def get_x(self) -> int:
-        y, x = self.window.getyx()
-        return x
     def get_y(self) -> int:
-        y, x = self.window.getyx()
-        return y
+        self.curs_y, self.curs_x = self.window.getyx()
+        return self.curs_y
+    def get_x(self) -> int:
+        self.curs_y, self.curs_x = self.window.getyx()
+        return self.curs_x
     
-    def max_x(self) -> int:
-        y, x = self.window.getmaxyx()
-        return x
     def max_y(self) -> int:
-        y, x = self.window.getmaxyx()
-        return y
+        self.cap_y, self.cap_x = self.window.getmaxyx()
+        return self.cap_y
+    def max_x(self) -> int:
+        self.cap_y, self.cap_x = self.window.getmaxyx()
+        return self.cap_x
     
     def get_char(self, y: int, x: int) -> str:
         raw = self.window.inch(y, x)
@@ -64,33 +65,10 @@ class Content():
     
     # ----------------------------------------------------------------------------------------------------
     # Needs to be improved. Lazy error handling.
-    def auto_wrap(self, func, *args, **kwargs):
-        if self.ycoord > 0:
-            self.ycoord += 2
-            self.xcoord = 0
-        while True:
-            try:
-                self.window.move(self.ycoord, self.xcoord)
-                output = func(*args, **kwargs)
-                self.ycoord, self.xcoord = self.window.getyx()
-                return output
-            except:
-                try:
-                    self.window.addstr('\n\n')
-                    self.ycoord, self.xcoord = self.window.getyx()
-                except curses.error:
-                    raise
-            
-    def inner_textbox(self, text, rate: float = 0.001):
-        for char in str(text):
-            self.window.addch(char) # Draws each character of the message one at a time
-            self.window.refresh()
-            sleep(rate)
-        self.ycoord, self.xcoord = self.window.getyx()
-        return self.ycoord
 
     def textbox(self, text, rate: float = 0.001):
-        return self.auto_wrap(self.inner_textbox, text, rate)
+
+        return 
 
     # ----------------------------------------------------------------------------------------------------
     def inputbox(self):
@@ -100,40 +78,40 @@ class Content():
             # 'Letter' logic
             input = ALPHABET[input]
             self.window.addch(input)
-            self.ycoord, self.xcoord = self.window.getyx()
-
+            self.curs_y, self.curs_x = self.window.getyx()
+            
         elif input in SPECIAL_CHARACTERS:
             # 'Space' logic
             if input == 32:
                 self.window.addch(' ')
-                self.ycoord, self.xcoord = self.window.getyx()
+                self.curs_y, self.curs_x = self.window.getyx()
 
             # 'Newline' logic
             if input in (10, 459):
                 self.window.addstr('\n')
-                self.ycoord, self.xcoord = self.window.getyx()
+                self.curs_y, self.curs_x = self.window.getyx()
 
             # 'Delete' logic
             if input in (8, 330):
-                if self.xcoord > 0: #
-                    self.window.move(self.ycoord, self.xcoord - 1)
+                if self.curs_x > 0: #
+                    self.window.move(self.curs_y, self.curs_x - 1)
                     self.window.delch()
-                    self.xcoord -= 1
-                elif self.xcoord <= 0 and self.ycoord > 0:
-                    self.ycoord -= 1
-                    self.xcoord = self.max_x() - 1
+                    self.curs_x -= 1
+                elif self.curs_x <= 0 and self.curs_y > 0:
+                    self.curs_y -= 1
+                    self.curs_x = self.max_x() - 1
                     while True:
-                        if self.get_char(self.ycoord, self.xcoord) == ' ':
-                            self.xcoord -= 1
+                        if self.get_char(self.curs_y, self.curs_x) == ' ':
+                            self.curs_x -= 1
                         else:
                             try:
-                                self.window.move(self.ycoord, self.xcoord+1)
-                                self.ycoord, self.xcoord = self.window.getyx()
+                                self.window.move(self.curs_y, self.curs_x+1)
+                                self.curs_y, self.curs_x = self.window.getyx()
                                 break
                             except:
-                                self.window.addch(self.ycoord, self.xcoord, ' ')
-                                self.window.move(self.ycoord, self.xcoord)
-                                self.ycoord, self.xcoord = self.window.getyx()
+                                self.window.addch(self.curs_y, self.curs_x, ' ')
+                                self.window.move(self.curs_y, self.curs_x)
+                                self.curs_y, self.curs_x = self.window.getyx()
                                 break
         curses.curs_set(0)
     # ----------------------------------------------------------------------------------------------------
@@ -146,9 +124,6 @@ class Content():
                     self.window.addstr(option) # Draws option; i = index, 0 = left-margin, option = display-text
                     self.window.addstr('\n')
                     self.window.attron(curses.color_pair(1)) # Turns off highlighter
-
-
-
 
             self.window.refresh()
             key = self.window.getch()
@@ -173,6 +148,7 @@ if __name__ == "__main__":
         while True:
             app.inputbox()
 
+
         
-    Terminal(main).run()
+    print(Terminal(main).run())
 

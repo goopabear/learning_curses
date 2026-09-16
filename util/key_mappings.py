@@ -1,16 +1,9 @@
-"""
-key_mappings.py
 
-Dictionaries mapping curses key codes (int) to their key name (str).
-
-Note: The numpad-specific codes below (Enter, /, *, -, +, .) are
-windows-curses (PDCurses) values. On Linux/macOS ncurses, numpad keys
-typically send the same codes as their top-row equivalents instead.
-"""
 
 # --- Special / named keys ---------------------------------------------
 
 SPECIAL_CHARACTERS = {
+    32: "Spacebar",
     10: "Enter",
     27: "Escape",
     9: "Tab",
@@ -38,6 +31,9 @@ SPECIAL_CHARACTERS = {
     338: "Page Down",
     331: "Insert",
     330: "Delete",
+
+    # Window Resize
+    546: "Resize"
 }
 
 # --- Letter keys ---------------------------------------------------------
