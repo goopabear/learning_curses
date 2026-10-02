@@ -1,14 +1,14 @@
 
 # Let's try to make a module where we define functions that print repeatable block patterns using 'curses.
 
-from util.add_terminal import pop_out_terminal
+from util.add_terminal import curses_app
 from util.key_mappings import ALPHABET, SPECIAL_CHARACTERS
 from time import sleep
 import curses
 
 
 def load_window(inner_func):
-    @pop_out_terminal    
+    @curses_app(cols=100, rows=30)
     def UI(window):
         window.clear()
         try:
